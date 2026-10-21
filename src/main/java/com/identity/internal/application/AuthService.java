@@ -94,7 +94,7 @@ public class AuthService {
         // لو المستخدم مش موجود، بيتم رمي Exception.
         User user = userRepository
                 .findByEmailIgnoreCase(Request.email())
-                .orElseThrow(EmailAlreadyExistsException::new);
+                .orElseThrow(EmailNotFoundException::new);
 
         UserResponse userResponse = toUserResponse(user);
 
