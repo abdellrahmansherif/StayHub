@@ -82,7 +82,7 @@ public class AuthService {
         );
         User user = userRepository
                 .findByEmailIgnoreCase(Request.email())
-                .orElseThrow(EmailAlreadyExistsException::new);
+                .orElseThrow(EmailNotFoundException::new);
 
         UserResponse userResponse = toUserResponse(user);
 
