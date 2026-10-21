@@ -4,10 +4,9 @@ import com.identity.internal.domain.RefreshToken;
 import com.identity.internal.domain.Role;
 import com.identity.internal.domain.User;
 import com.identity.internal.domain.UserStatus;
-import com.identity.internal.exceptions.EmailAlreadyExistsException;
-import com.identity.internal.exceptions.EmailNotFoundException;
-import com.identity.internal.exceptions.RefreshTokenExpiredException;
-import com.identity.internal.exceptions.RefreshTokenNotFoundException;
+import com.identity.internal.exception.EmailAlreadyExistsException;
+import com.identity.internal.exception.RefreshTokenExpiredException;
+import com.identity.internal.exception.RefreshTokenNotFoundException;
 import com.identity.internal.persistence.RefreshTokenRepository;
 import com.identity.internal.persistence.UserRepository;
 import com.identity.internal.web.dto.*;
@@ -42,10 +41,12 @@ public class AuthService {
 
     public RegisterResponse register(RegisterRequest request)
     {
+        // Checks whether an account with the same email already exists.
         if(userRepository.existsByEmailIgnoreCase(request.email()))
         {
             throw new EmailAlreadyExistsException();
         }
+        // Creates a new user account with an encoded password and the default CUSTOMER role.
         User user= User.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
@@ -54,18 +55,25 @@ public class AuthService {
                 .userStatus(UserStatus.ACTIVE)
                 .role(Role.CUSTOMER)
                 .build();
+
+        // Saves the new user account in the database.
         userRepository.save(user);
 
+        // Converts the saved user entity into a response DTO.
         UserResponse userResponse = toUserResponse(user);
 
+        // Generates an access token for accessing protected API endpoints.
         String accessToken =
                 jwtService.generateAccessToken(user);
 
+        // Generates a refresh token for obtaining a new access token later.
         String refreshToken =
                 jwtService.generateRefreshToken();
 
+        // Saves the hashed refresh token and its metadata in the database.
         SaveTokenToRepo(refreshToken,user);
 
+        // Returns the tokens, token type, access token expiration time, and user details to the client. for the frontend
         return new RegisterResponse(
                 accessToken,
                 refreshToken,
@@ -80,6 +88,10 @@ public class AuthService {
         Authentication authentication=authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(Request.email(),Request.password())
         );
+
+        // البحث عن المستخدم في قاعدة البيانات باستخدام الإيميل،
+        // مع تجاهل الفرق بين الحروف الكبيرة والصغيرة.
+        // لو المستخدم مش موجود، بيتم رمي Exception.
         User user = userRepository
                 .findByEmailIgnoreCase(Request.email())
                 .orElseThrow(EmailAlreadyExistsException::new);

@@ -1,6 +1,6 @@
 package com.identity.internal.web;
 
-import com.identity.internal.exceptions.EmailAlreadyExistsException;
+import com.identity.internal.exception.EmailAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
