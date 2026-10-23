@@ -7,7 +7,7 @@ public class BadRequestException extends com.common.exception.ApplicationExcepti
     /**
      * @param message the message describing why the request is invalid
      */
-    protected BadRequestException(String message) {
+    public BadRequestException(String message) {
         super(message);
     }
 }

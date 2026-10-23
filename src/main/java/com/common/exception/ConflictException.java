@@ -6,7 +6,7 @@ public class ConflictException extends ApplicationException {
     /**
      * @param message the message explaining the conflict if anything already exists
      */
-    protected ConflictException(String message) {
+    public ConflictException(String message) {
         super(message);
     }
 }
