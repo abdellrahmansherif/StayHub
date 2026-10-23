@@ -11,6 +11,7 @@ import com.identity.internal.exceptions.RefreshTokenNotFoundException;
 import com.identity.internal.persistence.RefreshTokenRepository;
 import com.identity.internal.persistence.UserRepository;
 import com.identity.internal.web.dto.*;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
