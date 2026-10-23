@@ -5,6 +5,7 @@ import com.identity.internal.domain.Role;
 import com.identity.internal.domain.User;
 import com.identity.internal.domain.UserStatus;
 import com.identity.internal.exception.EmailAlreadyExistsException;
+import com.identity.internal.exception.EmailNotFoundException;
 import com.identity.internal.exception.RefreshTokenExpiredException;
 import com.identity.internal.exception.RefreshTokenNotFoundException;
 import com.identity.internal.persistence.RefreshTokenRepository;
@@ -126,14 +127,17 @@ public class AuthService {
                         .orElseThrow(
                                 RefreshTokenNotFoundException::new
                         );
-
+        // التأكد إن الـ Refresh Token لم يتم رفضه
         if (refreshToken.getRevokedAt() != null) {
             throw new RefreshTokenNotFoundException();
         }
+        // التأكد إن الـ Refresh Token لسه صالح ومعدّاش وقت انتهاء صلاحيته.
+        // لو انتهت صلاحيته، بنرمي Exception.
         if (Instant.now().isAfter(refreshToken.getExpiresAt())) {
             throw new RefreshTokenExpiredException();
         }
 
+        // استخراج المستخدم المرتبط بالـ Refresh Token
         User user = refreshToken.getUser();
 
         String newAccessToken =
@@ -172,6 +176,7 @@ public class AuthService {
     private String hashToken(String token) {
 
         try {
+            //:MessageDigest: كلاس موجود في Java مسؤول عن تنفيذ خوارزميات الـ Hashing.
             MessageDigest digest =
                     MessageDigest.getInstance("SHA-256");
 
@@ -186,5 +191,5 @@ public class AuthService {
             throw new IllegalStateException(e);
         }
     }
-//comment
+
 }
