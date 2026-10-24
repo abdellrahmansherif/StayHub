@@ -2,13 +2,21 @@ package com.hostverification.internal.web;
 
 import com.identity.api.CurrentUserFacade;
 import com.hostverification.internal.application.HostVerificationService;
+import com.hostverification.internal.web.dto.FaceMatchRequest;
 import com.hostverification.internal.web.dto.FaceMatchResponse;
+import com.hostverification.internal.web.dto.HostVerificationRequest;
 import com.hostverification.internal.web.dto.HostVerificationResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
@@ -16,36 +24,26 @@ import java.util.UUID;
 @RequestMapping("/host-verifications")
 @RequiredArgsConstructor
 public class HostVerificationController {
-
     private final HostVerificationService service;
     private final CurrentUserFacade currentUser;
 
-
-//200	OK	الطلب نجح (زي لما تجيب بيانات: GET)
-//201	Created	الطلب نجح وعملنا حاجة جديدة في الداتابيز (زي POST للإنشاء)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public HostVerificationResponse submit(
-            @RequestParam("full_name") String fullName,
-            @RequestParam("phone_number") String phoneNumber,
-            @RequestPart("id_front") MultipartFile idFront,
-            @RequestPart("id_back") MultipartFile idBack,
-            @RequestPart("selfie_photo") MultipartFile selfiePhoto) {
-        return service.submit(currentUser.getCurrentUserId(),
-                fullName, phoneNumber, idFront, idBack, selfiePhoto);
+    public ResponseEntity<?> submit(
+            @Valid @ModelAttribute HostVerificationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(service.submit(currentUser.getCurrentUserId(), request));
     }
 
     @GetMapping("/me")
-    public HostVerificationResponse getMine() {
-        return service.getByUser(currentUser.getCurrentUserId());
+    public ResponseEntity<?> getMine() {
+        return ResponseEntity.ok(service.getByUser(currentUser.getCurrentUserId()));
     }
 
     @PostMapping(value = "/{id}/face-match", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public FaceMatchResponse faceMatch(
+    public ResponseEntity<FaceMatchResponse> faceMatch(
             @PathVariable UUID id,
-            @RequestPart("id_front") MultipartFile idFront,
-            @RequestPart("selfie_photo") MultipartFile selfiePhoto) {
-        return service.runFaceMatch(currentUser.getCurrentUserId(), currentUser.isAdmin(),
-                id, idFront, selfiePhoto);
+            @Valid @ModelAttribute FaceMatchRequest request) {
+        return ResponseEntity.ok(service.runFaceMatch(
+                currentUser.getCurrentUserId(), currentUser.isAdmin(), id, request));
     }
 }
