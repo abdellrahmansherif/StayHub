@@ -13,15 +13,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-//flow
-//StayHub Backend
-//يستقبل صور البطاقة والسيلفي
-//FaceMatchClient
-//يجهّز HTTP request ويرسل الصورتين
-//AI Service
-//يحلل الصورتين ويرجع نتيجة المقارنة
-//FaceMatchResponse
-//يمثل النتيجة التي استقبلها الـ Backend
+
 @Component
 public class FaceMatchClient {
 

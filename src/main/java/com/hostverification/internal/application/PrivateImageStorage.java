@@ -1,56 +1,156 @@
+
 package com.hostverification.internal.application;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.common.exception.BadRequestException;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 
-/**
- * Local-disk storage for development. In production replace the body of
- * save()/urlFor() with S3 (or similar) and keep the bucket private.
- */
 @Component
+@RequiredArgsConstructor
 public class PrivateImageStorage {
 
-    private final Path root;
-    private final String baseUrl;
+    private final Cloudinary cloudinary;
 
-    //store the image link into database
-    public PrivateImageStorage(
-            @Value("${host-verification.storage.root-dir}") String rootDir,
-            @Value("${host-verification.storage.base-url}") String baseUrl) {
-        this.root = Path.of(rootDir).toAbsolutePath().normalize();
-        this.baseUrl = baseUrl;
-    }
+    private static final long MAX_SIZE = 5L * 1024 * 1024;
 
-    /** Saves the file and returns its key, e.g. hv/<id>/id_front.jpg
-     * - root: المجلد الأساسي للتخزين.
-     * - key: المسار النسبي للملف داخل مساحة التخزين.
-     * - target: المسار الكامل للملف على نظام الملفات.
-     * */
-    public String save(UUID verificationId, String name, String extension, MultipartFile file) {
-        String key = "hv/" + verificationId + "/" + name + "." + extension;
-        Path target = root.resolve(key).normalize();
-        if (!target.startsWith(root)) {
-            throw new BadRequestException("Invalid file path");
+    // Upload a protected image to Cloudinary.
+    // Return its key, not a public URL.
+    public String save(
+            UUID verificationId,
+            String name,
+            String extension,
+            MultipartFile file
+    ) {
+        if (file == null || file.isEmpty()) {
+            throw new BadRequestException("Image is required");
         }
-        try (InputStream in = file.getInputStream()) {
-            Files.createDirectories(target.getParent());
-            Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
+
+        if (file.getSize() > MAX_SIZE) {
+            throw new BadRequestException(
+                    "Image must not exceed 5 MB"
+            );
+        }
+
+        if (!extension.equals("jpg") &&
+                !extension.equals("png")) {
+            throw new BadRequestException(
+                    "Only JPG and PNG are supported"
+            );
+        }
+
+        String publicId =
+                "stayhub/host-verifications/"
+                        + verificationId
+                        + "/" + name;
+
+        try {
+            Map<?, ?> result = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap(
+                            "public_id", publicId,
+                            "resource_type", "image",
+                            "type", "authenticated",
+                            "overwrite", false
+                    )
+            );
+
+            String savedPublicId =
+                    (String) result.get("public_id");
+
+            String format =
+                    (String) result.get("format");
+
+            if (savedPublicId == null || format == null) {
+                throw new IllegalStateException(
+                        "Invalid Cloudinary upload response"
+                );
+            }
+
+            return savedPublicId + "." + format;
+
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to store file", e);
+            throw new IllegalStateException(
+                    "Failed to upload image to Cloudinary", e
+            );
         }
-        return key;
     }
 
+    // Create a time-limited authenticated download URL.
+    // Only call this after checking user permissions.
     public String urlFor(String key) {
-        return baseUrl + "/" + key;
+        if (key == null || key.isBlank()) {
+            return null;
+        }
+
+        int dot = key.lastIndexOf('.');
+
+        if (dot < 0) {
+            throw new IllegalArgumentException(
+                    "Invalid Cloudinary image key"
+            );
+        }
+
+        String publicId = key.substring(0, dot);
+        String format = key.substring(dot + 1);
+
+        long expiresAt =
+                Instant.now().plusSeconds(300).getEpochSecond();
+
+        try {
+            return cloudinary.privateDownload(
+                    publicId,
+                    format,
+                    ObjectUtils.asMap(
+                            "type", "authenticated",
+                            "resource_type", "image",
+                            "expires_at", expiresAt,
+                            "attachment", false
+                    )
+            );
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                    "Failed to generate image URL", e
+            );
+        }
+    }
+
+    // Delete an authenticated image from Cloudinary.
+    public void delete(String key) {
+        if (key == null || key.isBlank()) {
+            return;
+        }
+
+        int dot = key.lastIndexOf('.');
+
+        if (dot < 0) {
+            throw new IllegalArgumentException(
+                    "Invalid Cloudinary image key"
+            );
+        }
+
+        String publicId = key.substring(0, dot);
+
+        try {
+            cloudinary.uploader().destroy(
+                    publicId,
+                    ObjectUtils.asMap(
+                            "resource_type", "image",
+                            "type", "authenticated",
+                            "invalidate", true
+                    )
+            );
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Failed to delete Cloudinary image", e
+            );
+        }
     }
 }
