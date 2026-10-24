@@ -42,12 +42,10 @@ public class AuthService {
 
     public RegisterResponse register(RegisterRequest request)
     {
-        // Checks whether an account with the same email already exists.
         if(userRepository.existsByEmailIgnoreCase(request.email()))
         {
             throw new EmailAlreadyExistsException();
         }
-        // Creates a new user account with an encoded password and the default CUSTOMER role.
         User user= User.builder()
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
@@ -56,25 +54,18 @@ public class AuthService {
                 .userStatus(UserStatus.ACTIVE)
                 .role(Role.CUSTOMER)
                 .build();
-
-        // Saves the new user account in the database.
         userRepository.save(user);
 
-        // Converts the saved user entity into a response DTO.
         UserResponse userResponse = toUserResponse(user);
 
-        // Generates an access token for accessing protected API endpoints.
         String accessToken =
                 jwtService.generateAccessToken(user);
 
-        // Generates a refresh token for obtaining a new access token later.
         String refreshToken =
                 jwtService.generateRefreshToken();
 
-        // Saves the hashed refresh token and its metadata in the database.
         SaveTokenToRepo(refreshToken,user);
 
-        // Returns the tokens, token type, access token expiration time, and user details to the client. for the frontend
         return new RegisterResponse(
                 accessToken,
                 refreshToken,
@@ -89,10 +80,6 @@ public class AuthService {
         Authentication authentication=authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(Request.email(),Request.password())
         );
-
-        // البحث عن المستخدم في قاعدة البيانات باستخدام الإيميل،
-        // مع تجاهل الفرق بين الحروف الكبيرة والصغيرة.
-        // لو المستخدم مش موجود، بيتم رمي Exception.
         User user = userRepository
                 .findByEmailIgnoreCase(Request.email())
                 .orElseThrow(EmailNotFoundException::new);
@@ -127,17 +114,14 @@ public class AuthService {
                         .orElseThrow(
                                 RefreshTokenNotFoundException::new
                         );
-        // التأكد إن الـ Refresh Token لم يتم رفضه
+
         if (refreshToken.getRevokedAt() != null) {
             throw new RefreshTokenNotFoundException();
         }
-        // التأكد إن الـ Refresh Token لسه صالح ومعدّاش وقت انتهاء صلاحيته.
-        // لو انتهت صلاحيته، بنرمي Exception.
         if (Instant.now().isAfter(refreshToken.getExpiresAt())) {
             throw new RefreshTokenExpiredException();
         }
 
-        // استخراج المستخدم المرتبط بالـ Refresh Token
         User user = refreshToken.getUser();
 
         String newAccessToken =
@@ -176,7 +160,6 @@ public class AuthService {
     private String hashToken(String token) {
 
         try {
-            //:MessageDigest: كلاس موجود في Java مسؤول عن تنفيذ خوارزميات الـ Hashing.
             MessageDigest digest =
                     MessageDigest.getInstance("SHA-256");
 
@@ -191,5 +174,5 @@ public class AuthService {
             throw new IllegalStateException(e);
         }
     }
-
+//comment
 }

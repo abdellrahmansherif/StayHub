@@ -1,7 +1,7 @@
-package com.identity.internal.web.Service;
+package com.hostverification.internal.application;
 
 import com.common.exception.BadRequestException;
-import com.identity.internal.web.dto.FaceMatchResponse;
+import com.hostverification.internal.web.dto.FaceMatchResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatusCode;

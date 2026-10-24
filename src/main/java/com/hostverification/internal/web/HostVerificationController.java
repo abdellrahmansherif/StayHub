@@ -1,9 +1,9 @@
-package com.identity.internal.web.Controller;
+package com.hostverification.internal.web;
 
 import com.identity.api.CurrentUserFacade;
-import com.identity.internal.web.Service.HostVerificationService;
-import com.identity.internal.web.dto.FaceMatchResponse;
-import com.identity.internal.web.dto.HostVerificationResponse;
+import com.hostverification.internal.application.HostVerificationService;
+import com.hostverification.internal.web.dto.FaceMatchResponse;
+import com.hostverification.internal.web.dto.HostVerificationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

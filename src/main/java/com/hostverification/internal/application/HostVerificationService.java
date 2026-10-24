@@ -1,16 +1,16 @@
-package com.identity.internal.web.Service;
+package com.hostverification.internal.application;
 
 import com.common.exception.BadRequestException;
 import com.common.exception.ConflictException;
 import com.common.exception.NotFoundException;
 
-import com.identity.internal.domain.FaceMatchAttempt;
-import com.identity.internal.domain.HostVerification;
-import com.identity.internal.domain.VerificationStatus;
-import com.identity.internal.persistence.FaceMatchAttemptRepository;
-import com.identity.internal.persistence.HostVerificationRepository;
-import com.identity.internal.web.dto.FaceMatchResponse;
-import com.identity.internal.web.dto.HostVerificationResponse;
+import com.hostverification.internal.domain.FaceMatchAttempt;
+import com.hostverification.internal.domain.HostVerification;
+import com.hostverification.internal.domain.VerificationStatus;
+import com.hostverification.internal.persistence.FaceMatchAttemptRepository;
+import com.hostverification.internal.persistence.HostVerificationRepository;
+import com.hostverification.internal.web.dto.FaceMatchResponse;
+import com.hostverification.internal.web.dto.HostVerificationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
