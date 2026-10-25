@@ -8,10 +8,7 @@ import com.hostverification.internal.domain.HostVerification;
 import com.hostverification.internal.domain.VerificationStatus;
 import com.hostverification.internal.persistence.FaceMatchAttemptRepository;
 import com.hostverification.internal.persistence.HostVerificationRepository;
-import com.hostverification.internal.web.dto.FaceMatchRequest;
-import com.hostverification.internal.web.dto.FaceMatchResponse;
-import com.hostverification.internal.web.dto.HostVerificationRequest;
-import com.hostverification.internal.web.dto.HostVerificationResponse;
+import com.hostverification.internal.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,11 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -40,6 +33,27 @@ public class HostVerificationService {
     private final FaceMatchClient faceMatchClient;
 
     private final Set<UUID> inProgress = ConcurrentHashMap.newKeySet();
+
+    public HostStatusResponse getStatus(UUID userId){
+
+        Optional<HostVerification> result =
+                verifications.findFirstByUserIdOrderBySubmittedAtDesc(userId);
+
+        if (result.isEmpty()) {
+            return new HostStatusResponse(
+                    "NOT_SUBMITTED",
+                    false,
+                    true,
+                    false,
+                    null,
+                    null
+            );
+        }
+
+        return toHostStatusResponse(result.get());
+
+
+    }
 
     @Transactional
     public HostVerificationResponse submit(UUID userId, HostVerificationRequest request) {
@@ -155,6 +169,48 @@ public class HostVerificationService {
                 v.getSubmittedAt(),
                 v.getUpdatedAt()
         );
+    }
+
+    private HostStatusResponse toHostStatusResponse(HostVerification v) {
+
+        return switch (v.getStatus()) {
+
+            case PENDING -> new HostStatusResponse(
+                    "PENDING",
+                    false,
+                    false,
+                    false,
+                    null,
+                    null
+            );
+
+            case APPROVED -> new HostStatusResponse(
+                    "APPROVED",
+                    true,
+                    false,
+                    false,
+                    null,
+                    null
+            );
+
+            case REJECTED -> new HostStatusResponse(
+                    "REJECTED",
+                    false,
+                    false,
+                    true,
+                    null,
+                    null
+            );
+
+            case NEEDS_CLARIFICATION -> new HostStatusResponse(
+                    "NEEDS_CLARIFICATION",
+                    false,
+                    false,
+                    true,
+                    null,
+                    v.getClarificationMessage()
+            );
+        };
     }
 
     private String imageExtension(MultipartFile file, String field) {

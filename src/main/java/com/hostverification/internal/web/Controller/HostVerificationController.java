@@ -1,22 +1,17 @@
-package com.hostverification.internal.web;
+package com.hostverification.internal.web.Controller;
 
+import com.hostverification.internal.web.dto.HostVerificationResponse;
 import com.identity.api.CurrentUserFacade;
 import com.hostverification.internal.application.HostVerificationService;
 import com.hostverification.internal.web.dto.FaceMatchRequest;
 import com.hostverification.internal.web.dto.FaceMatchResponse;
 import com.hostverification.internal.web.dto.HostVerificationRequest;
-import com.hostverification.internal.web.dto.HostVerificationResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -33,6 +28,14 @@ public class HostVerificationController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.submit(currentUser.getCurrentUserId(), request));
     }
+
+    @GetMapping("/me/status")
+    public ResponseEntity<?> getStatus(){
+        return ResponseEntity.ok(service.getStatus(currentUser.getCurrentUserId()));
+    }
+
+
+
 
     @GetMapping("/me")
     public ResponseEntity<?> getMine() {
