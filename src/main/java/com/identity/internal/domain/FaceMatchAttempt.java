@@ -12,10 +12,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "face_match_attempts",
+//Make an Index On "verification_id " column
 indexes = @Index(name = "idx_face_match_attempts_verification_id",columnList = "verification_id")
 )
+
 public class FaceMatchAttempt {
     //column for random unique id for face_match_session
+    // uuid >> universally unique identifier  Hard and long to guess look like hexadecimal
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id",nullable = false,updatable = false)
@@ -29,6 +32,7 @@ public class FaceMatchAttempt {
      @fetch
        * Fetches the associated HostVerification lazily to avoid loading it
         unnecessarily when retrieving face match attempts.
+        هتفدني لما اجي اسحب البيانات انا مش كل مرة بعمله verification فالاستخدام قليل
      optional >> when you make a host verification you have to make a faceMatch
      */
 
@@ -46,6 +50,7 @@ public class FaceMatchAttempt {
     @Column(name = "threshold", nullable = false)
     private double threshold;
 
+    //عشن اخزن الenum فالداتا بيز كنص ممكن اخليها ordinal لو الترتيب بيفرق 0 -1 -2 وهكذا
     @Enumerated(EnumType.STRING)
     @Column(name = "result", nullable = false, length = 20)
     private FaceMatchResult result;

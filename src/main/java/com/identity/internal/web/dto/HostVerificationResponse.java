@@ -7,7 +7,7 @@ import com.identity.internal.domain.VerificationStatus;
 
 import java.time.Instant;
 import java.util.UUID;
-
+// we will not gonna make a "Host verification request " because we take text or photo not Jason format file
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record HostVerificationResponse(
         UUID id,
