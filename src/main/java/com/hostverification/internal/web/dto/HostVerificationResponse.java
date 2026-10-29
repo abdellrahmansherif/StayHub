@@ -1,9 +1,9 @@
-package com.identity.internal.web.dto;
+package com.hostverification.internal.web.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.identity.internal.domain.VerificationStatus;
+import com.hostverification.internal.domain.VerificationStatus;
 
 import java.time.Instant;
 import java.util.UUID;

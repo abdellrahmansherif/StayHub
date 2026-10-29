@@ -1,8 +1,7 @@
-package com.identity.internal.persistence;
+package com.hostverification.internal.persistence;
 
-import com.identity.internal.domain.HostVerification;
-import com.identity.internal.domain.VerificationStatus;
-import org.springframework.data.domain.Example;
+import com.hostverification.internal.domain.HostVerification;
+import com.hostverification.internal.domain.VerificationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;

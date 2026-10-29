@@ -1,6 +1,6 @@
-package com.identity.internal.persistence;
+package com.hostverification.internal.persistence;
 
-import com.identity.internal.domain.FaceMatchAttempt;
+import com.hostverification.internal.domain.FaceMatchAttempt;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

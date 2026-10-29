@@ -24,10 +24,8 @@ public class PrivateImageStorage {
 
     //store the image link into database
     public PrivateImageStorage(
-            // value >> is an annotation to get the variable and use it from env_file
             @Value("${host-verification.storage.root-dir}") String rootDir,
             @Value("${host-verification.storage.base-url}") String baseUrl) {
-        //بخزن بقي اللينك اللي موجود فال properties وبيهندله بس
         this.root = Path.of(rootDir).toAbsolutePath().normalize();
         this.baseUrl = baseUrl;
     }
@@ -36,11 +34,6 @@ public class PrivateImageStorage {
      * - root: المجلد الأساسي للتخزين.
      * - key: المسار النسبي للملف داخل مساحة التخزين.
      * - target: المسار الكامل للملف على نظام الملفات.
-     * -------------------------------------------------------
-     * - verificationId: رقم أو معرّف طلب التحقق.
-     * - name: اسم الصورة، زي id_front أو selfie_photo.
-     * - extension: امتداد الصورة، زي jpg أو png.
-     * - file: ملف الصورة الفعلي اللي المستخدم رفعه.
      * */
     public String save(UUID verificationId, String name, String extension, MultipartFile file) {
         String key = "hv/" + verificationId + "/" + name + "." + extension;
@@ -54,7 +47,6 @@ public class PrivateImageStorage {
         } catch (IOException e) {
             throw new IllegalStateException("Failed to store file", e);
         }
-        // the hole path of this photo exist in our server
         return key;
     }
 

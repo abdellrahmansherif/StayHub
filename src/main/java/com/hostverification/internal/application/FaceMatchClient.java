@@ -1,7 +1,7 @@
-package com.identity.internal.web.Service;
+package com.hostverification.internal.application;
 
 import com.common.exception.BadRequestException;
-import com.identity.internal.web.dto.FaceMatchResponse;
+import com.hostverification.internal.web.dto.FaceMatchResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatusCode;
@@ -13,15 +13,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-//flow
-//StayHub Backend
-//يستقبل صور البطاقة والسيلفي
-//FaceMatchClient
-//يجهّز HTTP request ويرسل الصورتين
-//AI Service
-//يحلل الصورتين ويرجع نتيجة المقارنة
-//FaceMatchResponse
-//يمثل النتيجة التي استقبلها الـ Backend
+
 @Component
 public class FaceMatchClient {
 
