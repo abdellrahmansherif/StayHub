@@ -1,7 +1,7 @@
-package com.identity.internal.web.dto;
+package com.hostverification.internal.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.identity.internal.domain.FaceMatchResult;
+import com.hostverification.internal.domain.FaceMatchResult;
 
 // Used both as the API response and to read the AI service's reply
 public record FaceMatchResponse(

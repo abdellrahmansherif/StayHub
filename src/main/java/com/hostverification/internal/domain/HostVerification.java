@@ -1,5 +1,7 @@
-package com.identity.internal.domain;
+package com.hostverification.internal.domain;
 
+// DecisionCommand, DocumentStorage, والـ exceptions
+// لو في نفس package الـ application مش محتاجة import
 import jakarta.persistence.*;
 import lombok.*;
 

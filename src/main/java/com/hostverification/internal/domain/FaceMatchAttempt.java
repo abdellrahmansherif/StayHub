@@ -1,4 +1,4 @@
-package com.identity.internal.domain;
+package com.hostverification.internal.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
