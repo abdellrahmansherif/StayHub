@@ -19,8 +19,10 @@ import java.util.UUID;
 @RequestMapping("/host-verifications")
 @RequiredArgsConstructor
 public class HostVerificationController {
+
     private final HostVerificationService service;
     private final CurrentUserFacade currentUser;
+
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> submit(
@@ -28,6 +30,7 @@ public class HostVerificationController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.submit(currentUser.getCurrentUserId(), request));
     }
+
 
     @GetMapping("/me/status")
     public ResponseEntity<?> getStatus(){
