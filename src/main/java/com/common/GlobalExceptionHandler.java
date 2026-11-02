@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.Instant;
 
+// Handles application exceptions globally and returns standardized API error responses.
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    // Handles conflicts and returns an HTTP 409 response.
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ApiError> handleConflict(
             ConflictException ex,
@@ -37,6 +39,7 @@ public class GlobalExceptionHandler {
     }
 
 
+    // Handles missing resources and returns an HTTP 404 response.
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ApiError> handleNotFound(
             NotFoundException ex,
@@ -55,6 +58,8 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(error);
     }
+
+    // Handles authentication-related exceptions and returns an HTTP 401 response.
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ApiError> handleUnauthorized(
             UnauthorizedException ex,
@@ -73,7 +78,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(error);
     }
-
+    // Handles invalid requests and returns an HTTP 400 response.
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiError> handleBadRequest(
             BadRequestException ex,

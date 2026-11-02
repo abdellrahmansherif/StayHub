@@ -1,4 +1,4 @@
-package com.identity.internal.exceptions;
+package com.identity.internal.exception;
 
 import com.common.exception.NotFoundException;
 
