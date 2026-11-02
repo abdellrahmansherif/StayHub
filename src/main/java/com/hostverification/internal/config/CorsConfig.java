@@ -1,4 +1,4 @@
-package com.hostverification.internal.application;
+package com.hostverification.internal.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
