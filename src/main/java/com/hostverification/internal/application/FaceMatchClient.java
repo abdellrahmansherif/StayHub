@@ -20,7 +20,7 @@ public class FaceMatchClient {
     //RestClient: أداة من Spring لإرسال HTTP requests إلى خدمات خارجية.
     private final RestClient restClient;
 
-    public FaceMatchClient(@Value("${host-verification.ai.base-url}") String baseUrl) {
+    public FaceMatchClient(@Value(value = "${host-verification.ai.base-url}") String baseUrl) {
         this.restClient = RestClient.builder()
                 .baseUrl(baseUrl)
                 .build();
